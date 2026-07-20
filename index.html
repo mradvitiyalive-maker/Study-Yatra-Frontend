@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Yatra - Chapterwise PYQs & Videos</title>
+    <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/mradvitiyalive-maker/logo/main/6147921504847466773.jpg" />
+    <script id="silence-benign-hmr-logs">
+      (function() {
+        // Intercept WebSocket to mock and bypass benign Vite HMR connection errors
+        var OriginalWebSocket = window.WebSocket;
+        if (OriginalWebSocket) {
+          class MockWebSocket {
+            constructor(url, protocols) {
+              this.url = url;
+              this.protocols = protocols;
+              this.readyState = 0; // CONNECTING
+              this.binaryType = 'blob';
+              this.extensions = '';
+              this.protocol = 'vite-hmr';
+              this.bufferedAmount = 0;
+              this.onopen = null;
+              this.onerror = null;
+              this.onclose = null;
+              this.onmessage = null;
+              this._listeners = {};
+              
+              var self = this;
+              setTimeout(function() {
+                self.readyState = 1; // OPEN
+                var openEvent = { type: 'open', target: self, currentTarget: self };
+                if (typeof self.onopen === 'function') {
+                  try { self.onopen(openEvent); } catch(e) {}
+                }
+                self.dispatchEvent(openEvent);
+              }, 50);
+            }
+
+            send(data) {}
+
+            close() {
+              this.readyState = 3; // CLOSED
+              var closeEvent = { type: 'close', code: 1000, reason: '', wasClean: true, target: this, currentTarget: this };
+              if (typeof this.onclose === 'function') {
+                try { this.onclose(closeEvent); } catch(e) {}
+              }
+              this.dispatchEvent(closeEvent);
+            }
+
+            addEventListener(type, listener) {
+              if (!this._listeners[type]) this._listeners[type] = [];
+              this._listeners[type].push(listener);
+            }
+
+            removeEventListener(type, listener) {
+              if (this._listeners[type]) {
+                var idx = this._listeners[type].indexOf(listener);
+                if (idx !== -1) this._listeners[type].splice(idx, 1);
+              }
+            }
+
+            dispatchEvent(event) {
+              var type = event.type;
+              var list = this._listeners[type];
+              if (list) {
+                for (var i = 0; i < list.length; i++) {
+                  try { list[i].call(this, event); } catch(e) {}
+                }
+              }
+              var onevent = this['on' + type];
+              if (typeof onevent === 'function') {
+                try { onevent.call(this, event); } catch(e) {}
+              }
+              return true;
+            }
+          }
+
+          var InterceptedWebSocket = function(url, protocols) {
+            var isViteHmr = false;
+            if (protocols === 'vite-hmr') {
+              isViteHmr = true;
+            } else if (Array.isArray(protocols) && protocols.indexOf('vite-hmr') !== -1) {
+              isViteHmr = true;
+            } else if (typeof url === 'string' && (url.indexOf('/vite') !== -1 || url.indexOf('hmr') !== -1)) {
+              isViteHmr = true;
+            }
+
+            if (isViteHmr) {
+              return new MockWebSocket(url, protocols);
+            }
+            return new OriginalWebSocket(url, protocols);
+          };
+
+          // Mimic original WebSocket prototype and static fields
+          InterceptedWebSocket.prototype = OriginalWebSocket.prototype;
+          for (var key in OriginalWebSocket) {
+            if (Object.prototype.hasOwnProperty.call(OriginalWebSocket, key)) {
+              InterceptedWebSocket[key] = OriginalWebSocket[key];
+            }
+          }
+          window.WebSocket = InterceptedWebSocket;
+        }
+
+        function shouldSuppress(err) {
+          if (!err) return false;
+          var str = String(err.message || err.reason || err.stack || err || '');
+          var lower = str.toLowerCase();
+          return (
+            lower.indexOf('websocket') !== -1 ||
+            lower.indexOf('web-socket') !== -1 ||
+            lower.indexOf('hmr') !== -1 ||
+            lower.indexOf('vite') !== -1 ||
+            lower.indexOf('closed without opened') !== -1 ||
+            lower.indexOf('connection closed') !== -1
+          );
+        }
+        window.addEventListener('unhandledrejection', function(event) {
+          if (shouldSuppress(event.reason) || shouldSuppress(event)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, true);
+        window.addEventListener('error', function(event) {
+          if (shouldSuppress(event.error) || shouldSuppress(event.message) || shouldSuppress(event)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, true);
+      })();
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
