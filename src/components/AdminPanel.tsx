@@ -110,6 +110,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
   const [ddExplanation, setDdExplanation] = useState<string>('');
   const [ddCorrectMotivation, setDdCorrectMotivation] = useState<string>('Ek question roz, rank ki taraf ek aur kadam. 🎯');
   const [ddWrongMotivation, setDdWrongMotivation] = useState<string>('Galtiyaan hi topper banati hain. Re-read the explanation! 📚');
+  const [ddMotivationImageUrl, setDdMotivationImageUrl] = useState<string>('');
   const [ddPublishDate, setDdPublishDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [ddStatus, setDdStatus] = useState<string>('Active');
 
@@ -1007,6 +1008,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
           explanation: ddExplanation,
           correctMotivationMessage: ddCorrectMotivation,
           wrongMotivationMessage: ddWrongMotivation,
+          motivationImageUrl: ddMotivationImageUrl,
           publishDate: ddPublishDate || ddDate,
           status: ddStatus
         })
@@ -1021,6 +1023,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
         setDdOptionC('');
         setDdOptionD('');
         setDdExplanation('');
+        setDdMotivationImageUrl('');
         loadDailyDoses();
       } else {
         triggerNotification('Failed to commit Daily Dose transaction.');
@@ -1044,6 +1047,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
     setDdExplanation(item.explanation);
     setDdCorrectMotivation(item.correctMotivationMessage || '');
     setDdWrongMotivation(item.wrongMotivationMessage || '');
+    setDdMotivationImageUrl(item.motivationImageUrl || '');
     setDdPublishDate(item.publishDate || item.date);
     setDdStatus(item.status);
     window.scrollTo({ top: 300, behavior: 'smooth' });
@@ -3469,6 +3473,31 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
                       className="w-full p-2.5 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl outline-none text-slate-800 dark:text-slate-100"
                     />
                   </div>
+                </div>
+
+                {/* Motivational quote image swap slide */}
+                <div className="space-y-1.5 pb-2">
+                  <label className="text-slate-500 uppercase tracking-wider block text-[10px] text-purple-600">Motivation Quote Image URL (optional)</label>
+                  <input 
+                    type="text"
+                    placeholder="https://raw.githubusercontent.com/.../quote.jpg"
+                    value={ddMotivationImageUrl}
+                    onChange={(e) => setDdMotivationImageUrl(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none text-slate-800 dark:text-slate-100"
+                  />
+                  <p className="text-[10px] text-slate-400 leading-relaxed">
+                    Paste a hosted image link (jpg/png). On the homepage, students can swap between today's question and this quote image using the arrow on the card.
+                  </p>
+                  {ddMotivationImageUrl && (
+                    <div className="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 max-w-xs">
+                      <img 
+                        src={ddMotivationImageUrl} 
+                        alt="Motivation quote preview" 
+                        className="w-full h-40 object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Additional metadata */}

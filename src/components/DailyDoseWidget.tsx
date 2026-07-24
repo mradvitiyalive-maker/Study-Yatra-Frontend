@@ -23,6 +23,7 @@ interface DailyDoseQuestion {
   explanation: string;
   correctMotivationMessage?: string;
   wrongMotivationMessage?: string;
+  motivationImageUrl?: string;
 }
 
 export default function DailyDoseWidget({ user }: DailyDoseWidgetProps) {
@@ -44,10 +45,27 @@ export default function DailyDoseWidget({ user }: DailyDoseWidgetProps) {
   // Confetti particles state
   const [confetti, setConfetti] = useState<{ id: number; left: number; color: string; duration: number; delay: number }[]>([]);
 
+  // Which slide is showing: 0 = question/result card, 1 = motivation quote image
+  const [activeSlide, setActiveSlide] = useState<0 | 1>(0);
+
   // Reload question whenever the user's selected exam profile shifts
   useEffect(() => {
     loadTodayDose();
   }, [user.targetExam, user.firebaseUid]);
+
+  // Reset to the question slide whenever a new Daily Dose loads
+  useEffect(() => {
+    setActiveSlide(0);
+  }, [question?.id]);
+
+  // Auto-swap between the question card and the motivation quote image every few seconds
+  useEffect(() => {
+    if (!question?.motivationImageUrl) return;
+    const timer = setInterval(() => {
+      setActiveSlide(prev => (prev === 0 ? 1 : 0));
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [question?.motivationImageUrl, question?.id]);
 
   const loadTodayDose = async () => {
     try {
@@ -235,6 +253,17 @@ export default function DailyDoseWidget({ user }: DailyDoseWidgetProps) {
         </div>
       </div>
 
+      {question.motivationImageUrl && activeSlide === 1 ? (
+        /* MOTIVATION QUOTE IMAGE SLIDE: swaps in place of the question card */
+        <div className="relative min-h-[420px] rounded-2xl overflow-hidden animate-fade-in z-10">
+          <img
+            src={question.motivationImageUrl}
+            alt="Daily motivation quote"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+      ) : (
+      <>
       {/* COMPLETED OVERLAY HERO CARD: Only visible if completed and NOT actively exploring review mode */}
       {completed && !isReviewMode ? (
         <div className="py-8 text-center flex flex-col items-center justify-center space-y-4 animate-fade-in relative z-10">
@@ -424,6 +453,19 @@ export default function DailyDoseWidget({ user }: DailyDoseWidgetProps) {
           )}
 
         </div>
+      )}
+      </>
+      )}
+
+      {/* Manual swap arrow: lets the user flip between the question and the motivation quote image */}
+      {question.motivationImageUrl && (
+        <button
+          onClick={() => setActiveSlide(prev => (prev === 0 ? 1 : 0))}
+          aria-label="Swap between question and motivational quote"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 hover:scale-110 transition-all cursor-pointer"
+        >
+          <ArrowRight className="h-4 w-4" />
+        </button>
       )}
     </div>
   );
