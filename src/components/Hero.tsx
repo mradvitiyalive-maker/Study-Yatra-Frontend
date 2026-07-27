@@ -115,7 +115,7 @@ export default function Hero({ branding, user, onInitiateExam, onOpenSamplePaper
                   className="group flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-purple-500 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 shadow-md transition-all duration-200 text-center cursor-pointer transform hover:-translate-y-1"
                 >
                   <span className="text-lg sm:text-xl mb-2">📝</span>
-                  <span className="text-base sm:text-lg font-bold font-poppins dark:text-white group-hover:text-white">Sample</span>
+                  <span className="text-base sm:text-lg font-bold font-poppins dark:text-white group-hover:text-white">Sample Papers</span>
                   <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-purple-100 mt-1">Test Papers</span>
                 </button>
               )}
