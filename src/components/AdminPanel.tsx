@@ -52,7 +52,8 @@ import {
   Search,
   Sparkles,
   Tv,
-  Eye
+  Eye,
+  FileText
 } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
@@ -97,6 +98,31 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
     lectureOrder: '1',
     thumbnailUrl: ''
   });
+  // Sample Paper Manager States
+  const [adminSamplePapers, setAdminSamplePapers] = useState<any[]>([]);
+  const [loadingSamplePapers, setLoadingSamplePapers] = useState<boolean>(false);
+  const [samplePaperFormLoading, setSamplePaperFormLoading] = useState<boolean>(false);
+  const [samplePaperDeleteConfirmId, setSamplePaperDeleteConfirmId] = useState<string | null>(null);
+  const [expandedSamplePaperId, setExpandedSamplePaperId] = useState<string | null>(null);
+  const [solutionFormLoading, setSolutionFormLoading] = useState<boolean>(false);
+  const [samplePaperForm, setSamplePaperForm] = useState({
+    id: '',
+    examType: 'JEE',
+    testType: 'chapterwise',
+    testName: '',
+    testOrder: '1',
+    syllabusPdfUrl: '',
+    testPdfUrl: '',
+    status: 'Active'
+  });
+  const [solutionForm, setSolutionForm] = useState({
+    id: '',
+    samplePaperId: '',
+    subject: '',
+    youtubeUrl: '',
+    solutionOrder: '1'
+  });
+
   const [ddId, setDdId] = useState<string | null>(null);
   const [ddDate, setDdDate] = useState<string>(() => new Date().toISOString().split('T')[0]);
   const [ddExamType, setDdExamType] = useState<string>('JEE');
@@ -865,6 +891,9 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
     if (activeSubTab === 'lectures') {
       loadAdminLectures();
     }
+    if (activeSubTab === 'sample-papers') {
+      loadAdminSamplePapers();
+    }
     if (activeSubTab === 'analytics') {
       loadYearStats();
       loadYearRangeOverride();
@@ -979,6 +1008,165 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
       }
     } catch (err) {
       console.error('Failed to delete lecture:', err);
+    }
+  };
+
+  const loadAdminSamplePapers = async () => {
+    try {
+      setLoadingSamplePapers(true);
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/sample-papers`, {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAdminSamplePapers(data.papers || []);
+      }
+    } catch (err) {
+      console.error('Failed to load admin sample papers:', err);
+    } finally {
+      setLoadingSamplePapers(false);
+    }
+  };
+
+  const resetSamplePaperForm = () => {
+    setSamplePaperForm({
+      id: '',
+      examType: 'JEE',
+      testType: 'chapterwise',
+      testName: '',
+      testOrder: String((adminSamplePapers.length || 0) + 1),
+      syllabusPdfUrl: '',
+      testPdfUrl: '',
+      status: 'Active'
+    });
+  };
+
+  const handleSaveSamplePaper = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!samplePaperForm.testName || !samplePaperForm.syllabusPdfUrl || !samplePaperForm.testPdfUrl) {
+      triggerNotification('Please provide Test Name, Syllabus PDF link, and Test PDF link.');
+      return;
+    }
+    try {
+      setSamplePaperFormLoading(true);
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/sample-papers/upsert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(samplePaperForm)
+      });
+      if (res.ok) {
+        triggerNotification(samplePaperForm.id ? 'Sample paper test updated!' : 'Sample paper test created!');
+        resetSamplePaperForm();
+        loadAdminSamplePapers();
+      } else {
+        const errData = await res.json();
+        triggerNotification(errData.error || 'Failed to save sample paper test.');
+      }
+    } catch (err: any) {
+      console.error('Failed to save sample paper test:', err);
+      triggerNotification(err.message || 'Error occurred while saving sample paper test.');
+    } finally {
+      setSamplePaperFormLoading(false);
+    }
+  };
+
+  const handleEditSamplePaperClick = (test: any) => {
+    setSamplePaperForm({
+      id: String(test.id),
+      examType: test.examType || 'JEE',
+      testType: test.testType || 'chapterwise',
+      testName: test.testName || '',
+      testOrder: String(test.testOrder || 1),
+      syllabusPdfUrl: test.syllabusPdfUrl || '',
+      testPdfUrl: test.testPdfUrl || '',
+      status: test.status || 'Active'
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteSamplePaper = async (id: string) => {
+    try {
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/sample-papers/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        triggerNotification('Sample paper test deleted.');
+        loadAdminSamplePapers();
+      } else {
+        triggerNotification('Failed to delete sample paper test.');
+      }
+    } catch (err) {
+      console.error('Failed to delete sample paper test:', err);
+    } finally {
+      setSamplePaperDeleteConfirmId(null);
+    }
+  };
+
+  const handleSaveSolution = async (e: React.FormEvent, samplePaperId: string) => {
+    e.preventDefault();
+    if (!solutionForm.subject || !solutionForm.youtubeUrl) {
+      triggerNotification('Please provide Subject and YouTube link for the solution.');
+      return;
+    }
+    try {
+      setSolutionFormLoading(true);
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/sample-papers/solutions/upsert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ ...solutionForm, samplePaperId })
+      });
+      if (res.ok) {
+        triggerNotification(solutionForm.id ? 'Solution link updated!' : 'Solution link added!');
+        setSolutionForm({ id: '', samplePaperId: '', subject: '', youtubeUrl: '', solutionOrder: '1' });
+        loadAdminSamplePapers();
+      } else {
+        const errData = await res.json();
+        triggerNotification(errData.error || 'Failed to save solution link.');
+      }
+    } catch (err: any) {
+      console.error('Failed to save solution link:', err);
+      triggerNotification(err.message || 'Error occurred while saving solution link.');
+    } finally {
+      setSolutionFormLoading(false);
+    }
+  };
+
+  const handleDeleteSolution = async (id: string) => {
+    try {
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/sample-papers/solutions/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        triggerNotification('Solution link deleted.');
+        loadAdminSamplePapers();
+      } else {
+        triggerNotification('Failed to delete solution link.');
+      }
+    } catch (err) {
+      console.error('Failed to delete solution link:', err);
     }
   };
 
@@ -1545,7 +1733,8 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
             { id: 'mentorship', label: 'Guidance slots', icon: ShieldCheck },
             { id: 'branding', label: 'Home Branding', icon: Settings },
             { id: 'daily-dose', label: 'Daily Dose Spec', icon: Sparkles },
-            { id: 'lectures', label: 'Lecture Management', icon: Tv }
+            { id: 'lectures', label: 'Lecture Management', icon: Tv },
+            { id: 'sample-papers', label: 'Sample Papers', icon: FileText }
           ].map((sub) => {
             const Icon = sub.icon;
             return (
@@ -3952,6 +4141,272 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
           </div>
 
+        </div>
+      )}
+
+      {activeSubTab === 'sample-papers' && (
+        <div id="sub-panel-sample-papers" className="space-y-6 animate-slide-up text-left">
+
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h3 className="text-xl sm:text-2xl font-black font-poppins bg-gradient-to-r from-amber-600 via-orange-600 to-amber-500 dark:from-amber-400 dark:via-orange-400 dark:to-amber-300 bg-clip-text text-transparent flex flex-wrap items-center gap-3">
+                <span className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-400/15 dark:to-orange-400/15 text-amber-700 dark:text-amber-300 text-[10px] font-bold tracking-widest px-3 py-1.5 rounded-lg border border-amber-500/20 dark:border-amber-500/30 shadow-amber-500/5 shadow-sm flex items-center gap-1.5 uppercase font-mono">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-600"></span>
+                  </span>
+                  SAMPLE PAPER HUB
+                </span>
+                <span>Sample Paper Test Manager</span>
+              </h3>
+              <p className="text-xs text-slate-450 leading-normal">
+                Add chapter-wise test syllabus PDFs, test PDFs (Google Drive links), and subject-wise solution video links.
+              </p>
+            </div>
+
+            {samplePaperForm.id && (
+              <button
+                onClick={resetSamplePaperForm}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-705 dark:bg-slate-800 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Cancel Edit Mode
+              </button>
+            )}
+          </div>
+
+          <div id="sample-paper-management-form-main" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            {/* Left: Add/Edit test form */}
+            <div className="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <h4 className="text-sm font-extrabold text-slate-850 dark:text-slate-200 uppercase tracking-wide border-b border-slate-100 dark:border-slate-800 pb-2 font-poppins">
+                {samplePaperForm.id ? '✏️ Edit Test' : '🚀 Add New Test'}
+              </h4>
+
+              <form onSubmit={handleSaveSamplePaper} className="space-y-4 text-xs font-semibold">
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Exam</label>
+                    <select
+                      value={samplePaperForm.examType}
+                      onChange={(e) => setSamplePaperForm(prev => ({ ...prev, examType: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                    >
+                      <option value="JEE">JEE</option>
+                      <option value="NEET">NEET</option>
+                      <option value="CBSE">CBSE</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Test Type</label>
+                    <select
+                      value={samplePaperForm.testType}
+                      onChange={(e) => setSamplePaperForm(prev => ({ ...prev, testType: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                    >
+                      <option value="chapterwise">Chapter-wise</option>
+                      <option value="full_length">Full-length</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Test Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., Test 1"
+                    value={samplePaperForm.testName}
+                    onChange={(e) => setSamplePaperForm(prev => ({ ...prev, testName: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Test Syllabus PDF (Google Drive link)</label>
+                  <input
+                    type="url"
+                    required
+                    placeholder="https://drive.google.com/file/d/..."
+                    value={samplePaperForm.syllabusPdfUrl}
+                    onChange={(e) => setSamplePaperForm(prev => ({ ...prev, syllabusPdfUrl: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Test PDF (Google Drive link)</label>
+                  <input
+                    type="url"
+                    required
+                    placeholder="https://drive.google.com/file/d/..."
+                    value={samplePaperForm.testPdfUrl}
+                    onChange={(e) => setSamplePaperForm(prev => ({ ...prev, testPdfUrl: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Column Order</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={samplePaperForm.testOrder}
+                      onChange={(e) => setSamplePaperForm(prev => ({ ...prev, testOrder: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 uppercase tracking-wider block text-[10px]">Status</label>
+                    <select
+                      value={samplePaperForm.status}
+                      onChange={(e) => setSamplePaperForm(prev => ({ ...prev, status: e.target.value }))}
+                      className="w-full px-3 py-2 border rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={samplePaperFormLoading}
+                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center select-none cursor-pointer transition-all disabled:opacity-50"
+                >
+                  {samplePaperFormLoading ? 'Updating DB...' : samplePaperForm.id ? '💾 Save Changes' : '➕ Create Test'}
+                </button>
+
+              </form>
+            </div>
+
+            {/* Right: Test catalogue with expandable subject-wise solutions */}
+            <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-4">
+              <h4 className="text-sm font-extrabold text-slate-850 dark:text-slate-200 uppercase tracking-wide border-b border-slate-100 dark:border-slate-800 pb-2 font-poppins flex justify-between items-center">
+                <span>📄 Sample Paper Catalogue ({adminSamplePapers.length})</span>
+                <button
+                  onClick={loadAdminSamplePapers}
+                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-amber-600 rounded transition-all"
+                  title="Reload"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </button>
+              </h4>
+
+              {loadingSamplePapers ? (
+                <div className="py-12 text-center flex flex-col items-center justify-center">
+                  <RefreshCw className="h-6 w-6 mt-3 text-amber-600 animate-spin" />
+                  <span className="text-[10px] text-slate-400 font-mono mt-2">Connecting to Sample Papers API...</span>
+                </div>
+              ) : adminSamplePapers.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 italic text-xs">
+                  No sample paper tests added yet. Create one using the form on the left.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {adminSamplePapers.map((test: any) => (
+                    <div key={test.id} className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+                      <div className="p-3 flex flex-wrap items-center justify-between gap-2 bg-slate-50 dark:bg-slate-950">
+                        <div>
+                          <span className="text-[10px] font-mono uppercase text-slate-400">{test.examType} · {test.testType === 'full_length' ? 'Full-length' : 'Chapter-wise'} · #{test.testOrder}</span>
+                          <h5 className="font-bold text-slate-800 dark:text-white text-sm">{test.testName}</h5>
+                          <span className={`inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${test.status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
+                            {test.status}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => setExpandedSamplePaperId(expandedSamplePaperId === test.id ? null : test.id)}
+                            className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded text-[10px] uppercase font-black font-poppins cursor-pointer"
+                          >
+                            {expandedSamplePaperId === test.id ? 'Hide Solutions' : `Solutions (${test.solutions?.length || 0})`}
+                          </button>
+                          <button
+                            onClick={() => handleEditSamplePaperClick(test)}
+                            className="px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-950/45 dark:text-purple-350 rounded text-[10px] uppercase font-black font-poppins cursor-pointer"
+                          >
+                            ✏️ Edit
+                          </button>
+                          {samplePaperDeleteConfirmId === test.id ? (
+                            <button
+                              onClick={() => handleDeleteSamplePaper(test.id)}
+                              className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[10px] uppercase font-black font-poppins cursor-pointer animate-pulse"
+                              title="Click again to confirm delete"
+                            >
+                              ⚠️ Confirm?
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setSamplePaperDeleteConfirmId(test.id)}
+                              className="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-650 dark:bg-red-955/45 dark:text-red-355 rounded text-[10px] uppercase font-black font-poppins cursor-pointer"
+                            >
+                              🗑️ Delete
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {expandedSamplePaperId === test.id && (
+                        <div className="p-4 space-y-3 bg-white dark:bg-slate-900">
+                          {(test.solutions || []).map((sol: any) => (
+                            <div key={sol.id} className="flex items-center justify-between gap-2 p-2 bg-slate-50 dark:bg-slate-950 rounded-xl text-xs">
+                              <span className="font-semibold text-slate-700 dark:text-slate-200">
+                                {sol.subject} — <a href={sol.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">link</a>
+                              </span>
+                              <button
+                                onClick={() => handleDeleteSolution(sol.id)}
+                                className="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-650 dark:bg-red-955/45 dark:text-red-355 rounded text-[10px] uppercase font-black cursor-pointer"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          ))}
+
+                          <form
+                            onSubmit={(e) => handleSaveSolution(e, test.id)}
+                            className="flex flex-wrap items-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800"
+                          >
+                            <div className="flex-1 min-w-[120px] space-y-1">
+                              <label className="text-slate-500 uppercase tracking-wider block text-[9px]">Subject</label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="e.g., Physics"
+                                value={solutionForm.samplePaperId === test.id ? solutionForm.subject : ''}
+                                onChange={(e) => setSolutionForm({ id: '', samplePaperId: test.id, subject: e.target.value, youtubeUrl: solutionForm.samplePaperId === test.id ? solutionForm.youtubeUrl : '', solutionOrder: String((test.solutions?.length || 0) + 1) })}
+                                className="w-full px-2 py-1.5 border rounded-lg bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white text-xs"
+                              />
+                            </div>
+                            <div className="flex-[2] min-w-[160px] space-y-1">
+                              <label className="text-slate-500 uppercase tracking-wider block text-[9px]">YouTube Solution Link</label>
+                              <input
+                                type="url"
+                                required
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                value={solutionForm.samplePaperId === test.id ? solutionForm.youtubeUrl : ''}
+                                onChange={(e) => setSolutionForm(prev => ({ ...prev, samplePaperId: test.id, youtubeUrl: e.target.value }))}
+                                className="w-full px-2 py-1.5 border rounded-lg bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-805 dark:text-white text-xs"
+                              />
+                            </div>
+                            <button
+                              type="submit"
+                              disabled={solutionFormLoading}
+                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[10px] cursor-pointer disabled:opacity-50"
+                            >
+                              ➕ Add
+                            </button>
+                          </form>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
       )}
 

@@ -25,6 +25,7 @@ import LectureLibrary from './components/LectureLibrary';
 import MockPredictor from './components/MockPredictor';
 import PitStops from './components/PitStops';
 import SingleQuestionPractice from './components/SingleQuestionPractice';
+import SamplePaper from './components/SamplePaper';
 import { Play, X, Sparkles, BookOpen, Clock, Layers, Database, ShieldAlert, Terminal, Activity } from 'lucide-react';
 
 import { auth, authReady } from './lib/firebase';
@@ -72,6 +73,7 @@ const PROTECTED_TABS = [
   'dashboard',
   'admin',
   'practice-onboarding',
+  'sample-paper',
   'chapter-library',
   'practice-session',
   'single-practice',
@@ -515,6 +517,7 @@ export default function App() {
                 setActiveChapterIdForLectures(chapterId);
                 setCurrentTab('lectures');
               }}
+              onOpenSamplePaper={() => setCurrentTab('sample-paper')}
               branding={branding}
               step={onboardStep}
               setStep={setOnboardStep}
@@ -525,6 +528,13 @@ export default function App() {
               subject={onboardSubject}
               setSubject={setOnboardSubject}
             />
+          </div>
+        )}
+
+        {/* SAMPLE PAPER FEATURE VIEW */}
+        {currentTab === 'sample-paper' && (
+          <div className="animate-fade-in">
+            <SamplePaper />
           </div>
         )}
 
