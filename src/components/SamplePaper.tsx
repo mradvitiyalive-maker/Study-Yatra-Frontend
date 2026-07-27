@@ -30,7 +30,6 @@ export default function SamplePaper() {
   const [tests, setTests] = useState<SamplePaperTest[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTest, setActiveTest] = useState<SamplePaperTest | null>(null);
-  const [attempted, setAttempted] = useState(false);
 
   const examOptions: { id: Exam; desc: string; icon: any }[] = [
     { id: 'JEE', desc: 'Joint Entrance Exam (Engineering)', icon: Target },
@@ -64,7 +63,6 @@ export default function SamplePaper() {
 
   const openTest = (test: SamplePaperTest) => {
     setActiveTest(test);
-    setAttempted(false);
     setStep('detail');
   };
 
@@ -192,15 +190,13 @@ export default function SamplePaper() {
               href={activeTest.testPdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setAttempted(true)}
               className="block w-full text-center py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold rounded-xl text-sm cursor-pointer transition-all"
             >
               Open Test PDF
             </a>
           </div>
 
-          {attempted && (
-            <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 animate-slide-up">
+          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 animate-slide-up">
               <h5 className="text-xs uppercase tracking-wide font-bold text-slate-500 mb-3">Subject-wise Solutions</h5>
               {activeTest.solutions.length === 0 ? (
                 <p className="text-xs text-slate-400">Solutions will be added soon.</p>
@@ -219,8 +215,7 @@ export default function SamplePaper() {
                   ))}
                 </div>
               )}
-            </div>
-          )}
+          </div>
         </div>
       )}
     </div>
