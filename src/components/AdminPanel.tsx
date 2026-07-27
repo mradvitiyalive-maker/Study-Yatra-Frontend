@@ -618,7 +618,12 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
   const loadDailyDoses = async () => {
     try {
       setLoadingDailyDoses(true);
-      const res = await fetch(`${API_BASE_URL}/api/admin/daily-dose`);
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/daily-dose`, {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         setDailyDoseList(data);
@@ -881,7 +886,12 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
   const loadAdminLectures = async () => {
     try {
       setLoadingLectures(true);
-      const res = await fetch(`${API_BASE_URL}/api/admin/lectures`);
+      const token = await getAuthToken();
+      const res = await fetch(`${API_BASE_URL}/api/admin/lectures`, {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         setAdminLectures(data || []);
@@ -913,10 +923,12 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
         subject: matchedChapter ? matchedChapter.subject : lectureForm.subject,
       };
 
+      const token = await getAuthToken();
       const res = await fetch(`${API_BASE_URL}/api/admin/lectures/upsert`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify(payload)
       });
@@ -950,10 +962,12 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
   const handleDeleteLecture = async (id: number) => {
     try {
+      const token = await getAuthToken();
       const res = await fetch(`${API_BASE_URL}/api/admin/lectures/delete`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ id })
       });
@@ -991,9 +1005,13 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
       return;
     }
     try {
+      const token = await getAuthToken();
       const res = await fetch(`${API_BASE_URL}/api/admin/daily-dose/upsert`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           id: ddId,
           date: ddDate,
@@ -1055,9 +1073,13 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
   const handleDeleteDailyDoseChoice = async (id: string) => {
     try {
+      const token = await getAuthToken();
       const res = await fetch(`${API_BASE_URL}/api/admin/daily-dose/delete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ id })
       });
       if (res.ok) {
