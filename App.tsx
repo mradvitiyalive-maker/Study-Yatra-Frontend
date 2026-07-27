@@ -470,7 +470,6 @@ export default function App() {
               branding={branding} 
               user={user}
               onInitiateExam={handleLaunchDirectExamPath} 
-              onOpenSamplePaper={() => setCurrentTab('sample-paper')}
             />
 
             {/* Mock Test Rank Predictor Feature Block */}

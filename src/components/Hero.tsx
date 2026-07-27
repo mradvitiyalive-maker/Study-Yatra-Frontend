@@ -7,9 +7,10 @@ interface HeroProps {
   branding: BrandingConfig;
   user: UserProfile;
   onInitiateExam: (exam: Exam) => void;
+  onOpenSamplePaper?: () => void;
 }
 
-export default function Hero({ branding, user, onInitiateExam }: HeroProps) {
+export default function Hero({ branding, user, onInitiateExam, onOpenSamplePaper }: HeroProps) {
   const renderHeadline = (text: string) => {
     const regex = /(Boring\s+Nhi|Study\s+Yatra)/gi;
     const parts = text.split(regex);
@@ -71,7 +72,7 @@ export default function Hero({ branding, user, onInitiateExam }: HeroProps) {
               Choose Your Target Exam to Start Journey:
             </p>
             
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-xl mx-auto">
               
               {/* JEE Button */}
               <button
@@ -105,6 +106,19 @@ export default function Hero({ branding, user, onInitiateExam }: HeroProps) {
                 <span className="text-base sm:text-lg font-bold font-poppins dark:text-white group-hover:text-white">CBSE</span>
                 <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-indigo-100 mt-1">Board Exams</span>
               </button>
+
+              {/* Sample Paper Button */}
+              {onOpenSamplePaper && (
+                <button
+                  id="cta-sample"
+                  onClick={onOpenSamplePaper}
+                  className="group flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border-2 border-purple-500 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600 shadow-md transition-all duration-200 text-center cursor-pointer transform hover:-translate-y-1"
+                >
+                  <span className="text-lg sm:text-xl mb-2">📝</span>
+                  <span className="text-base sm:text-lg font-bold font-poppins dark:text-white group-hover:text-white">Sample</span>
+                  <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 group-hover:text-purple-100 mt-1">Test Papers</span>
+                </button>
+              )}
 
             </div>
           </div>
