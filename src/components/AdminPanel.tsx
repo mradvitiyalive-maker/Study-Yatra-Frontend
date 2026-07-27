@@ -3739,7 +3739,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
                 <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800/85">
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-purple-650 hover:bg-purple-750 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer hover:scale-[1.01]"
+                    className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer hover:scale-[1.01]"
                   >
                     {ddId ? 'Update & Push Live' : 'Save & Publish Question'}
                   </button>
