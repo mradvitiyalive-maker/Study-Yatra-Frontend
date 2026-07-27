@@ -253,10 +253,10 @@ fetch(`${API_BASE_URL}/api/year-range`)
               <button
                 id="onboard-sample-paper"
                 onClick={onOpenSamplePaper}
-                className="p-6 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:shadow-lg hover:border-amber-500 focus:outline-none focus:ring-amber-500/20 transition-all cursor-pointer text-left"
+                className="p-6 bg-white dark:bg-slate-800 rounded-2xl border-2 border-slate-200 dark:border-slate-700 hover:shadow-lg hover:border-purple-500 focus:outline-none focus:ring-purple-500/20 transition-all cursor-pointer text-left"
               >
                 <div className="flex items-center justify-between">
-                  <HelpCircle className="h-8 w-8 text-amber-500" />
+                  <HelpCircle className="h-8 w-8 text-purple-500" />
                   <span className="text-xs font-bold text-slate-400 uppercase">Tests</span>
                 </div>
                 <h4 className="text-xl font-bold font-poppins text-slate-800 dark:text-white mt-4">Sample Paper</h4>

@@ -4149,11 +4149,11 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h3 className="text-xl sm:text-2xl font-black font-poppins bg-gradient-to-r from-amber-600 via-orange-600 to-amber-500 dark:from-amber-400 dark:via-orange-400 dark:to-amber-300 bg-clip-text text-transparent flex flex-wrap items-center gap-3">
-                <span className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-400/15 dark:to-orange-400/15 text-amber-700 dark:text-amber-300 text-[10px] font-bold tracking-widest px-3 py-1.5 rounded-lg border border-amber-500/20 dark:border-amber-500/30 shadow-amber-500/5 shadow-sm flex items-center gap-1.5 uppercase font-mono">
+              <h3 className="text-xl sm:text-2xl font-black font-poppins bg-gradient-to-r from-purple-600 via-violet-600 to-purple-500 dark:from-purple-400 dark:via-violet-400 dark:to-purple-300 bg-clip-text text-transparent flex flex-wrap items-center gap-3">
+                <span className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 dark:from-purple-400/15 dark:to-violet-400/15 text-purple-700 dark:text-purple-300 text-[10px] font-bold tracking-widest px-3 py-1.5 rounded-lg border border-purple-500/20 dark:border-purple-500/30 shadow-purple-500/5 shadow-sm flex items-center gap-1.5 uppercase font-mono">
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-600"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-purple-600"></span>
                   </span>
                   SAMPLE PAPER HUB
                 </span>
@@ -4274,7 +4274,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
                 <button
                   type="submit"
                   disabled={samplePaperFormLoading}
-                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-center select-none cursor-pointer transition-all disabled:opacity-50"
+                  className="w-full py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-xl text-center select-none cursor-pointer transition-all disabled:opacity-50"
                 >
                   {samplePaperFormLoading ? 'Updating DB...' : samplePaperForm.id ? '💾 Save Changes' : '➕ Create Test'}
                 </button>
@@ -4288,7 +4288,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
                 <span>📄 Sample Paper Catalogue ({adminSamplePapers.length})</span>
                 <button
                   onClick={loadAdminSamplePapers}
-                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-amber-600 rounded transition-all"
+                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-purple-600 rounded transition-all"
                   title="Reload"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -4297,7 +4297,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
               {loadingSamplePapers ? (
                 <div className="py-12 text-center flex flex-col items-center justify-center">
-                  <RefreshCw className="h-6 w-6 mt-3 text-amber-600 animate-spin" />
+                  <RefreshCw className="h-6 w-6 mt-3 text-purple-600 animate-spin" />
                   <span className="text-[10px] text-slate-400 font-mono mt-2">Connecting to Sample Papers API...</span>
                 </div>
               ) : adminSamplePapers.length === 0 ? (
@@ -4393,7 +4393,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
                             <button
                               type="submit"
                               disabled={solutionFormLoading}
-                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg text-[10px] cursor-pointer disabled:opacity-50"
+                              className="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-lg text-[10px] cursor-pointer disabled:opacity-50"
                             >
                               ➕ Add
                             </button>

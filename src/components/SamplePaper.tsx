@@ -165,7 +165,7 @@ export default function SamplePaper() {
                     </a>
                     <button
                       onClick={() => openTest(test)}
-                      className="w-full py-2 bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold rounded-xl text-xs cursor-pointer transition-all"
+                      className="w-full py-2 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-xl text-xs cursor-pointer transition-all"
                     >
                       Attempt Test
                     </button>
@@ -194,7 +194,7 @@ export default function SamplePaper() {
               href={activeTest.testPdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-center py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold rounded-xl text-sm cursor-pointer transition-all"
+              className="block w-full text-center py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-xl text-sm cursor-pointer transition-all"
             >
               Open Test PDF
             </a>
