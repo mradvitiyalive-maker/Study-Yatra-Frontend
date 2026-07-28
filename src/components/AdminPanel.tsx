@@ -237,9 +237,9 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
   const downloadSampleCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
-      + "exam_type,class_level,subject,chapter,year,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,difficulty\n"
-      + "JEE,Class 12,Physics,Electrostatics,2024,\"What is the electric field inside a perfectly conducting sphere?\",Zero,Infinite,Variable,Depends on charge,A,\"Electric field inside a conductor is zero under electrostatic conditions.\",Easy\n"
-      + "NEET,Class 11,Chemistry,Some Basic Concepts of Chemistry,2023,\"Who proposed the law of conservation of mass?\",Antoine Lavoisier,John Dalton,Joseph Proust,Robert Boyle,A,\"Antoine Lavoisier established mass conservation in chemical reactions.\",Medium";
+      + "exam_type,class_level,subject,chapter,year,exam_date,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,difficulty\n"
+      + "JEE,Class 12,Physics,Electrostatics,2024,2024-01-27,\"What is the electric field inside a perfectly conducting sphere?\",Zero,Infinite,Variable,Depends on charge,A,\"Electric field inside a conductor is zero under electrostatic conditions.\",Easy\n"
+      + "NEET,Class 11,Chemistry,Some Basic Concepts of Chemistry,2023,,\"Who proposed the law of conservation of mass?\",Antoine Lavoisier,John Dalton,Joseph Proust,Robert Boyle,A,\"Antoine Lavoisier established mass conservation in chemical reactions.\",Medium";
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -2037,8 +2037,9 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
                     <p className="text-xs text-slate-450 leading-relaxed">
                       Upload your Excel or CSV syllabus spreadsheets directly. Ensure columns are structured according to Study Yatra PYQ boundaries:<br/>
                       <span className="font-mono bg-slate-50 dark:bg-slate-950 p-1.5 rounded block text-[10px] text-purple-600 dark:text-purple-400 mt-2 line-clamp-2">
-                        exam_type, class_level, subject, chapter, year, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, difficulty
+                        exam_type, class_level, subject, chapter, year, exam_date, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, difficulty
                       </span>
+                      <span className="text-[10px] text-slate-400 block mt-1">exam_date is optional (e.g. 2024-01-27) — leave blank if unknown. exam_type must be exactly JEE, NEET, or CBSE.</span>
                     </p>
 
                     <div className="flex gap-3">
