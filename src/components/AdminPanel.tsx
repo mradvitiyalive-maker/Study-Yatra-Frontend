@@ -312,7 +312,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
       const data = await res.json();
       if (res.ok) {
-        triggerNotification(`Mubarak ho! ${data.count} questions successfully committed to Cloud SQL PostgreSQL database!`);
+        triggerNotification(`${data.count} PYQs uploaded successfully.`);
         setCsvPreview(null);
         setCsvText('');
         loadAllAdminData();
@@ -507,7 +507,7 @@ export default function AdminPanel({ user, branding, onRefreshBranding, onRefres
 
       const data = await res.json();
       if (res.ok) {
-        triggerNotification(`Mubarak ho! Successfully saved ${data.count} questions to the database.`);
+        triggerNotification(`${data.count} PYQs uploaded successfully.`);
         const withExp = preparedQuestions.filter(q => q.explanation !== null).length;
         setPdfReport({
           totalExtracted: preparedQuestions.length,

@@ -45,6 +45,33 @@ interface PracticeSessionProps {
   startQuestionIndex?: number;
 }
 
+// Safely formats an exam date for the header. Handles ISO (YYYY-MM-DD) and
+// common Indian entry formats (DD-MM-YYYY, DD/MM/YYYY). Returns an empty
+// string instead of "Invalid Date" if the value can't be parsed, so the
+// header just falls back to showing the session instead.
+function formatExamDateSafe(raw: string): string {
+  if (!raw || !raw.trim()) return '';
+
+  const tryFormat = (d: Date) => {
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  };
+
+  // Try native parsing first (covers ISO strings like 2024-01-27)
+  const direct = tryFormat(new Date(raw));
+  if (direct) return direct;
+
+  // Fall back to DD-MM-YYYY or DD/MM/YYYY
+  const match = raw.trim().match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (match) {
+    const [, day, month, year] = match;
+    const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+    return tryFormat(parsed);
+  }
+
+  return '';
+}
+
 export default function PracticeSession({ 
   chapterId, 
   onExit,
@@ -748,9 +775,8 @@ export default function PracticeSession({
               {/* Dynamic Exam/Year/Session Display Header */}
               <h1 className="text-base sm:text-lg font-black font-poppins text-slate-900 dark:text-white tracking-tight">
                 {chapter.exam === 'JEE' ? 'JEE Main' : chapter.exam} {selectedYear !== 'All' ? selectedYear : (questions[currentIndex]?.year || '2025')} {
-                  questions[currentIndex]?.examDate
-                    ? new Date(questions[currentIndex].examDate as string).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
-                    : (selectedSession !== 'All' ? selectedSession : (questions[currentIndex]?.session && questions[currentIndex]?.session !== 'All' ? questions[currentIndex]?.session : ''))
+                  formatExamDateSafe(questions[currentIndex]?.examDate as string)
+                    || (selectedSession !== 'All' ? selectedSession : (questions[currentIndex]?.session && questions[currentIndex]?.session !== 'All' ? questions[currentIndex]?.session : ''))
                 }
               </h1>
               <p className="text-[11px] text-slate-400 font-medium font-mono uppercase mt-0.5">
