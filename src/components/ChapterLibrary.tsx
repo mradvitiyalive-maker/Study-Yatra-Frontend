@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Chapter, Question } from '../types';
 import { getStoredChapters } from '../utils/storage';
+import { deriveSessionLabel } from '../utils/sessionLabel';
 import { API_BASE_URL } from '../config';
 
 interface ChapterLibraryProps {
@@ -110,7 +111,7 @@ export default function ChapterLibrary({ chapterId, onBack, onStartPractice }: C
 
     questions.forEach(q => {
       // Determine session name
-      const sessionName = q.session || (q.examType === 'JEE' ? 'January' : q.examType);
+      const sessionName = deriveSessionLabel(q);
       const key = `${q.examType}-${q.year}-${sessionName}`;
       if (!map[key]) {
         map[key] = [];

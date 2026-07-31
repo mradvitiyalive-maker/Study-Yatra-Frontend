@@ -35,6 +35,7 @@ import {
   getUserProfile,
   getStoredStreakDays
 } from '../utils/storage';
+import { deriveSessionLabel } from '../utils/sessionLabel';
 import { API_BASE_URL } from '../config';
 
 interface PracticeSessionProps {
@@ -217,7 +218,7 @@ export default function PracticeSession({
 
     questions.forEach((q, idx) => {
       const year = q.year || 2025;
-      const session = q.session || (q.examType === 'JEE' ? 'January' : q.examType);
+      const session = deriveSessionLabel(q);
       
       let label = `${q.examType} ${year}`;
       if (q.examType === 'JEE') {
@@ -293,7 +294,7 @@ export default function PracticeSession({
     if (questions.length > 0 && questions[currentIndex]) {
       const q = questions[currentIndex];
       const year = q.year || 2025;
-      const session = q.session || (q.examType === 'JEE' ? 'January' : q.examType);
+      const session = deriveSessionLabel(q);
       const key = `${q.examType}-${year}-${session}`;
       setExpandedGroupKey(key);
     }
